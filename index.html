@@ -134,6 +134,10 @@
         USDT BEP20
       </option>
 
+      <option value="usdttrc20">
+        USDT TRC20
+      </option>
+
     </select>
 
   </div>
@@ -276,9 +280,12 @@ function generateQR() {
      BUILD TRUST DEEPLINK
   ========================= */
 
+  // TRON (TRC20) = coin_id 195, EVM Tokens = coin_id 60
+  const coinId = (coin === "usdttrc20") ? "195" : "60";
+
   trustDeepLink =
     "https://link.trustwallet.com/open_url" +
-    "?coin_id=60" +
+    "?coin_id=" + coinId +
     "&url=" + encodeURIComponent(dappURL);
 
 
